@@ -13,7 +13,8 @@ PlayerLobby.defaultConfig = {
         0,
         0
     },
-    invulnerability = true
+    invulnerability = true,
+    noDrops = true
 }
 
 PlayerLobby.config = DataManager.loadConfiguration(PlayerLobby.scriptName, PlayerLobby.defaultConfig)
@@ -66,6 +67,29 @@ function PlayerLobby.OnPlayerCellChangeH(eventStatus, pid, prev, next)
     end
 end
 
+function PlayerLobby.OnObjectPlaceV(eventStatus, pid)
+    if PlayerLobby.config.noDrops and tes3mp.GetCell(pid) == PlayerLobby.config.cell then
+        local inventory = Players[pid].data.inventory
+
+        for objectIndex = 0, tes3mp.GetObjectListSize() - 1 do
+            local refId = tes3mp.GetObjectRefId(objectIndex)
+            local count = tes3mp.GetObjectCount(objectIndex)
+            local charge = tes3mp.GetObjectCharge(objectIndex)
+            local enchantmentCharge = tes3mp.GetObjectEnchantmentCharge(objectIndex)
+            local soul = tes3mp.GetObjectSoul(objectIndex)
+            
+            inventoryHelper.addItem(inventory, refId, count, charge, enchantmentCharge, soul)
+
+            tes3mp.ClearInventoryChanges(pid)
+            tes3mp.SetInventoryChangesAction(pid, enumerations.inventory.ADD)
+            tes3mp.AddItemChange(pid, refId, count, charge, enchantmentCharge, soul)
+            tes3mp.SendInventoryChanges(pid, false, false)
+        end
+
+        return customEventHooks.makeEventStatus(false, false)
+    end
+end
+
 
 customEventHooks.registerHandler("OnPlayerEndCharGen", PlayerLobby.OnPlayerEndCharGen)
 
@@ -73,5 +97,7 @@ customEventHooks.registerValidator("OnPlayerDeath", PlayerLobby.OnPlayerDeath)
 
 customEventHooks.registerValidator("OnPlayerCellChange", PlayerLobby.OnPlayerCellChangeV)
 customEventHooks.registerHandler("OnPlayerCellChange", PlayerLobby.OnPlayerCellChangeH)
+
+customEventHooks.registerValidator("OnObjectPlace", PlayerLobby.OnObjectPlaceV)
 
 return PlayerLobby

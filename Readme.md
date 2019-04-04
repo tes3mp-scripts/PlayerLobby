@@ -8,6 +8,7 @@ You can find the configuration file in `server/data/custom/__config_PlayerLobby.
 * `cell` cellDescription of your chosen lobby cell. I recommend one of the [test cells](https://en.uesp.net/wiki/Morrowind:Test_Cells).
 * `pos` position in which to spawn players inside given cell.
 * `rot` initial rotation of players spawning in.
-* `invulnerability` whether player should not be able to die inside the lobby cell.
+* `invulnerability` whether players should be able to die inside the lobby cell.
+* `noDrops` whether players can place items in the lobby
 
 Provides a `PlayerLobby_Leave` event and a `teleportToLobby(pid)` function to be used in other scripts.
